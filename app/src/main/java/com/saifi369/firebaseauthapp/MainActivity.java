@@ -1,14 +1,16 @@
 package com.saifi369.firebaseauthapp;
 
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.google.android.material.textfield.TextInputLayout;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
         mBtnSignin.setOnClickListener(this::singInUser);
         mBtnRegisterUser.setOnClickListener(this::createUser);
+
+        hideProgressBar();
 
     }
 
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
             mPasswordLayout.setError("Password is required. Can't be empty.");
             return false;
         } else if (password.length() < 6) {
-            mPasswordLayout.setError("Password length short. Minimum 6 characters required.");
+            mPasswordLayout.setError("Password short. Minimum 6 characters required.");
             return true;
         } else {
             mPasswordLayout.setError(null);
