@@ -9,10 +9,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
 import androidx.annotation.NonNull;
@@ -81,10 +85,16 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "User logged in", Toast.LENGTH_SHORT).show();
 //                            updateUI();
                         } else {
-                            Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
                             hideProgressBar();
-                        }
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                Toast.makeText(MainActivity.this, "Invalid Password", Toast.LENGTH_SHORT).show();
+                                mOutputText.setText("Invalid Password");
+                            } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                                Toast.makeText(MainActivity.this, "Email not is use", Toast.LENGTH_SHORT).show();
+                                mOutputText.setText("Email not in use");
+                            }
 
+                        }
                     }
                 });
 
@@ -122,18 +132,19 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "User created", Toast.LENGTH_SHORT).show();
                             hideProgressBar();
 //                            updateUI();
-                        } else {
-                            Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
-                            hideProgressBar();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        hideProgressBar();
+                        if (e instanceof FirebaseAuthUserCollisionException) {
+                            Toast.makeText(MainActivity.this, "Email already in use", Toast.LENGTH_SHORT).show();
+                            mOutputText.setText("Email already in use");
                         }
                     }
                 });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-//        updateUI();
     }
 
     private void initViews() {
