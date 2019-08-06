@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
 
     private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +45,18 @@ public class MainActivity extends AppCompatActivity {
 
         hideProgressBar();
 
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                updateUI();
+            }
+        };
+
     }
 
     private void signOutUser(View view) {
         mAuth.signOut();
-        updateUI();
+//        updateUI();
     }
 
     private void singInUser(View view) {
@@ -71,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             hideProgressBar();
                             Toast.makeText(MainActivity.this, "User logged in", Toast.LENGTH_SHORT).show();
-                            updateUI();
+//                            updateUI();
                         } else {
                             Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
                             hideProgressBar();
@@ -113,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(MainActivity.this, "User created", Toast.LENGTH_SHORT).show();
                             hideProgressBar();
-                            updateUI();
+//                            updateUI();
                         } else {
                             Toast.makeText(MainActivity.this, "Error occurred", Toast.LENGTH_SHORT).show();
                             hideProgressBar();
@@ -125,8 +133,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        updateUI();
-
+//        updateUI();
     }
 
     private void initViews() {
@@ -178,5 +185,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void hideProgressBar() {
         mProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mAuthStateListener != null) {
+            if (mAuth == null) {
+                mAuth.removeAuthStateListener(mAuthStateListener);
+            }
+        }
     }
 }
